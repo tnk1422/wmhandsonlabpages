@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Post Request</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        textarea {
+            width: 50%;
+            height: 200px;
+            padding: 10px;
+            font-size: 16px;
+            align-self: center;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+
+        input {
+            width: 50%;
+            height: 50px;
+            padding: 10px;
+            font-size: 16px;
+            align-self: center;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+    <script>
+        function postData() {
+            var input = document.getElementById("inputText").value;
+            var url = document.getElementById("url").value;
+            var webhook_key = document.getElementById("webhook_key").value;
+            var data = { "prompt": input };
+            console.log(data);
+
+            var xhr = new XMLHttpRequest();
+            var proxyURL = 'https://cors-anywhere.herokuapp.com';
+            xhr.open("POST", proxyURL + '/' + url, true);
+            xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+            xhr.setRequestHeader("webhook_key", webhook_key);
+            xhr.timeout = 180000; // 180 seconds
+            document.getElementById("output").value ="Request in progress";
+            document.getElementById("output").style.backgroundColor = "yellow";
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        document.getElementById("output").value =xhr.responseText;
+                        if(xhr.responseText=="positive")
+                            document.getElementById("output").style.backgroundColor = "green";
+                        if(xhr.responseText=="negative")
+                            document.getElementById("output").style.backgroundColor = "red";
+                        if(xhr.responseText=="neutral")
+                            document.getElementById("output").style.backgroundColor = "lightblue";
+                        console.log("API request successful!");
+                        // Handle the response data here
+                    } else {
+                        console.log("API request failed!");
+                        document.getElementById("output").value =xhr.responseText;
+                        // Handle the error here
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify(data));
+        }
+    </script>
+</head>
+<body>
+    <h1>Please provide your workflow URL </h1>
+    <input type="text" id="url" placeholder="Enter your workflow url here"><br>
+    <h1>Please provide your webhook_key </h1>
+    <input type="text" id="webhook_key" placeholder="Enter your webhook_key here"><br>
+    <h1>Please submit your review comments </h1>
+    <textarea id="inputText" placeholder="Enter your text here"></textarea><br>
+    <h1>Response from workflow</h1>
+    <textarea readonly id="output"></textarea>
+    <button onclick="postData()">Submit</button>
+</body>
+</html>
